@@ -14,19 +14,24 @@ public class Musica {
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false)
-    private Integer numeroDeOuvintes;
+    @OneToOne(mappedBy = "musica", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private NumeroDeOuvintes numeroDeOuvintes;
 
-    @Column(nullable = false)
-    private Integer quantidadeLikes;
+    @OneToOne(mappedBy = "musica", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private QuantidadeDeLikes quantidadeLikes;
 
     private LocalDateTime criadoEm = now();
 
     private LocalDateTime atualiazadoEm = now();
 
+    @Version
+    private int version;
+
 
     public Musica(String nome) {
         this.nome = nome;
+        this.numeroDeOuvintes = new NumeroDeOuvintes(this);
+        this.quantidadeLikes = new QuantidadeDeLikes(this);
     }
 
     /**
@@ -38,11 +43,19 @@ public class Musica {
 
 
     public void aumentarOuvinte() {
-        this.numeroDeOuvintes++;
+        this.numeroDeOuvintes.incrementa();
     }
 
     public void aumentarLikes() {
-        this.quantidadeLikes++;
+        this.quantidadeLikes.incrementa();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void atualiza(MusicaRequest musicaRequest) {
+        this.nome = musicaRequest.getNome();
     }
 }
 
